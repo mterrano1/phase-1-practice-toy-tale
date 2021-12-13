@@ -1,4 +1,6 @@
 let addToy = false;
+const EMPTY_HEART = '♡'
+const FULL_HEART = '♥'
 
 document.addEventListener("DOMContentLoaded", () => {
   const addBtn = document.querySelector("#new-toy-btn");
@@ -21,35 +23,61 @@ function renderOneToy(toy){
   card.innerHTML = `
     <h2>${toy.name}</h2>
     <img src='${toy.image}' class='toy-avatar'>
-    <p>''</p>
-    <button class='like-btn' id=${toy.id}>'Like heart pic'</button>
+    <p>'0 likes'</p>
+    <button class='like-btn' id=${toy.id}>${EMPTY_HEART}</button>
   `
+
 document.querySelector('#toy-collection').appendChild(card)
 }
 
-const sendToy = {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application.json",
-  },
-  body: JSON.stringify({
-    name: 'Baby Yoda',
-    image: 'https://target.scene7.com/is/image/Target/GUEST_c9596f8d-70ad-4700-af78-39b40fd95e09?wid=488&hei=488&fmt=pjpeg',
-    likes: 0
-  }),
-};
+// document.querySelector('like-btn').addEventListener('click', () => {
+//   document.querySelector('p').textContent = `${likes} likes`
+// });
 
-function getAllToys(){
+// sendLike = {
+//   method: "PATCH",
+//   headers: {
+//     "Content-Type": "application/json",
+//     Accept: "application.json",
+//   },
+//   body: JSON.stringify(jsonDataOne),
+// };
+
+document.querySelector('form').addEventListener('submit', (e) => {
+  e.preventDefault();  
+  let inputName = e.target[0].value;
+  let inputUrl = e.target[1].value;
+
+  let jsonData = {
+    name: inputName,
+    image: inputUrl,
+    likes: 0
+  }
+
+  sendToy = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application.json",
+    },
+    body: JSON.stringify(jsonData),
+  };
+  postFetch()
+})
+
+function postFetch(){
   fetch('http://localhost:3000/toys', sendToy)
   .then(res => res.json())
   // .then(toys => toys.forEach(toy => renderOneToy(toy)))
-  .then(toys => renderOneToy(toys))
+  .then(data => renderOneToy(data))
 }
 
-function initialize(){
-  getAllToys()
+function getAllToys(){
+  fetch('http://localhost:3000/toys')
+  .then(res => res.json())
+  .then(toys => toys.forEach(toy => renderOneToy(toy)))
 }
 
-initialize();
+getAllToys()
+
 
